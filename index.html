@@ -100,8 +100,7 @@
     <div class="row">
       <button class="primary" id="check">Check my answers</button>
       <button class="ghost" id="reset">Start over</button>
-      <button class="warn" id="key">Teacher key</button>
-    </div>
+          </div>
   </div>
 
   <div class="card hidden" id="results">
@@ -143,7 +142,7 @@ const Q = [
  {s:"What should students write at the end of practice?",o:["The names of every player","The number of goals Lena scored","One skill they want to improve","A reason to cancel the next practice"],a:2,e:"The final instruction is to identify a skill for improvement.",skill:"details"}
 ];
 const L="ABCD";
-let answers=Array(Q.length).fill(null), checked=false, plays=0, keyShown=false;
+let answers=Array(Q.length).fill(null), checked=false, plays=0;
 
 // ---- transcript
 document.getElementById('transcript').innerHTML = SCRIPT.map(p=>`<p>${p}</p>`).join('');
@@ -218,13 +217,9 @@ function finish(){
   document.getElementById('results').scrollIntoView({behavior:'smooth'});
 }
 document.getElementById('reset').onclick=()=>ask('Clear all answers and start over?',()=>{
-  answers=Array(Q.length).fill(null); checked=false; keyShown=false; render();
+  answers=Array(Q.length).fill(null); checked=false; render();
   document.getElementById('results').classList.add('hidden'); document.getElementById('goal').value='';
 });
-document.getElementById('key').onclick=()=>{
-  if(keyShown){ document.querySelectorAll('.opt.key').forEach(o=>o.classList.remove('key')); keyShown=false; return; }
-  ask('Show the answer key? (Teacher use)',()=>{ Q.forEach((q,i)=>document.getElementById(`o${i}_${q.a}`).classList.add('key')); keyShown=true; });
-};
 document.getElementById('copy').onclick=()=>{
   const name=document.getElementById('name').value||'(no name)', block=document.getElementById('block').value||'—';
   const lines=Q.map((q,i)=>`${i+1}. ${answers[i]===null?'—':L[answers[i]]}${answers[i]===q.a?' ✔':' ✘'}`).join('\n');
