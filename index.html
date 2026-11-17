@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Change of Plans — Listening Practice</title>
+<style>
+  :root{--navy:#14213d;--blue:#1d4ed8;--sky:#dbeafe;--ok:#15803d;--okbg:#dcfce7;--bad:#b91c1c;--badbg:#fee2e2;--ink:#1f2937;--mute:#6b7280;--line:#e5e7eb;--bg:#f6f7fb}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  header{background:var(--navy);color:#fff;padding:18px 16px}
+  header .kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+  header h1{margin:4px 0 2px;font-size:26px;font-style:italic}
+  header p{margin:0;font-size:14px;opacity:.9}
+  main{max-width:760px;margin:0 auto;padding:16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  .card h2{margin:0 0 8px;font-size:17px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:600}
+  .primary{background:var(--blue);color:#fff}
+  .ghost{background:var(--sky);color:var(--navy)}
+  .warn{background:#fef3c7;color:#92400e}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  label.sm{font-size:13px;color:var(--mute)}
+  select,input[type=text]{font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px}
+  .note{font-size:13px;color:var(--mute)}
+  .es{font-style:italic;color:var(--mute)}
+  .q{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+  .q.correct{border-color:var(--ok);background:var(--okbg)}
+  .q.wrong{border-color:var(--bad);background:var(--badbg)}
+  .qnum{display:inline-block;background:var(--navy);color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-size:13px;font-weight:700;margin-right:8px}
+  .stem{font-weight:600;margin-bottom:8px}
+  .opt{display:flex;gap:8px;align-items:flex-start;padding:8px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+  .opt:hover{background:#f3f4f6}
+  .opt input{margin-top:4px}
+  .opt.picked{border-color:var(--blue);background:var(--sky)}
+  .opt.key{border-color:var(--ok);background:#bbf7d0}
+  .fb{font-size:13px;margin-top:6px;display:none}
+  .q.correct .fb,.q.wrong .fb{display:block}
+  .score{font-size:22px;font-weight:700}
+  .bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:8px 0}
+  .bar div{height:100%;background:var(--ok);width:0;transition:width .4s}
+  .hidden{display:none}
+  .transcript p{margin:0 0 10px}
+  .pill{font-size:12px;background:var(--sky);color:var(--navy);padding:3px 8px;border-radius:99px}
+  .playing{animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.6}}
+  footer{text-align:center;font-size:12px;color:var(--mute);padding:20px}
+  .dlg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;padding:16px}
+  .dlg .box{background:#fff;border-radius:12px;padding:18px;max-width:380px;width:100%}
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker">Storm Studio • Grades 9–12 • Listening</div>
+  <h1>A Change of Plans</h1>
+  <p>Listen to a coach explain soccer practice</p>
+</header>
+<main>
+
+  <div class="card">
+    <div class="row">
+      <label class="sm">Name <input type="text" id="name" placeholder="Your name"></label>
+      <label class="sm">Block <input type="text" id="block" style="width:60px"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Step 1 — Listen <span class="es">/ Escucha</span></h2>
+    <p class="note">Listen once for the main idea. Then listen again while you answer. <span class="es">Escucha una vez para la idea principal. Luego escucha otra vez mientras contestas.</span></p>
+    <audio id="audio" src="coach-rivera.mp3" preload="auto"></audio>
+    <div class="row">
+      <button class="primary" id="play">▶ Play Coach Rivera</button>
+      <button class="ghost" id="stop" disabled>■ Stop</button>
+      <label class="sm">Speed
+        <select id="rate">
+          <option value="0.8">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="1.15">Faster</option>
+        </select>
+      </label>
+      <span class="pill" id="plays">Plays: 0</span>
+      <span class="pill" id="time">0:00 / 1:28</span>
+    </div>
+    <div class="bar"><div id="audioBar" style="background:var(--blue)"></div></div>
+    <p class="note" id="ttsNote">Recorded read-aloud (about 1½ minutes). If it won't play, your teacher can read the script aloud.</p>
+    <div class="row" style="margin-top:8px">
+      <button class="ghost" id="togTranscript">Show transcript (teacher / support)</button>
+    </div>
+    <div class="transcript hidden" id="transcript" style="margin-top:10px;padding:12px;background:#f9fafb;border-radius:8px;font-size:15px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Step 2 — Answer <span class="es">/ Contesta</span></h2>
+    <p class="note">Choose ONE answer for each question. <span class="es">Escoge UNA respuesta para cada pregunta.</span></p>
+    <div class="row" style="margin-bottom:10px">
+      <label class="sm"><input type="checkbox" id="instant"> Show feedback after each answer</label>
+    </div>
+    <div id="quiz"></div>
+    <div class="row">
+      <button class="primary" id="check">Check my answers</button>
+      <button class="ghost" id="reset">Start over</button>
+      <button class="warn" id="key">Teacher key</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="results">
+    <h2>Results</h2>
+    <div class="score" id="scoreTxt"></div>
+    <div class="bar"><div id="barFill"></div></div>
+    <p id="skills" class="note"></p>
+    <div id="reflect">
+      <label class="sm">Just like the coach asked: write one listening skill you want to improve next time.<br>
+      <input type="text" id="goal" style="width:100%;margin-top:6px" placeholder="Example: I want to listen for words like 'first' and 'after'…"></label>
+      <div class="row" style="margin-top:8px"><button class="ghost" id="copy">Copy my results</button><span class="note" id="copied"></span></div>
+    </div>
+  </div>
+
+  <footer>Original ELPA21-inspired classroom practice • Not an official test item • Design reference: Oregon Dept. of Education ELPA grades 9–12 Listening specifications</footer>
+</main>
+
+<div class="dlg" id="dlg"><div class="box"><p id="dlgMsg"></p><div class="row" style="justify-content:flex-end"><button class="ghost" id="dlgNo">Cancel</button><button class="primary" id="dlgYes">OK</button></div></div></div>
+
+<script>
+const SCRIPT = [
+"Good afternoon, team. This is Coach Rivera. Our soccer field is too wet to use today, so we will practice in the gym. Please leave your cleats in your bags and wear your regular athletic shoes. We will use soft soccer balls indoors.",
+"Today, we have three stations. At the first station, move the ball slowly around the cones. Keep it close to your feet. At the second station, make short passes with a partner. At the third station, aim for a small goal. You will spend eight minutes at each station. When you hear my whistle, move to the next station.",
+"Maya asked if she should kick as hard as possible at the small goal. For this activity, accuracy matters more than power. Accuracy means sending the ball where you intend it to go. A strong kick is not useful if the ball misses the target. There is also less space in the gym than on our field, so careful control is especially important.",
+"Noah is new to soccer. He asked if he could watch his partner first. That is fine. Watch one demonstration, and then try the activity. Partners should explain the steps and encourage each other. We are here to learn, not to make fun of mistakes.",
+"After your group completes all three stations, take a water break. Keep your bottles beside the wall, away from the practice area. At the end of practice, write down one skill you want to improve next time. Now, watch Lena demonstrate the first station. Notice how slowly she starts. You can increase your speed after you understand the steps."
+];
+
+const Q = [
+ {s:"Why does the coach move practice to the gym?",o:["The field has no goals.","The field is too wet.","The team needs to watch a video.","The gym is larger than the field."],a:1,e:"The field is too wet to use.",skill:"details"},
+ {s:"What should students wear for this practice?",o:["Their soccer cleats","Their school uniforms","Their swimming shoes","Their regular athletic shoes"],a:3,e:"The coach asks students to leave cleats in their bags.",skill:"details"},
+ {s:"What will students do at the first station?",o:["Move a ball around cones","Pass with a partner","Aim at the small goal","Write about their favorite sport"],a:0,e:"The first station is ball control around cones.",skill:"sequence"},
+ {s:"What tells students to move to the next station?",o:["A partner raises a hand.","A bell rings after ten minutes.","The coach blows a whistle.","Lena finishes every activity."],a:2,e:"Students move when they hear the coach's whistle.",skill:"details"},
+ {s:"What does <em>accuracy</em> mean in the talk?",o:["Kicking with as much power as possible","Sending the ball where you intend it to go","Moving faster than every other player","Trying a new activity without watching"],a:1,e:"The coach defines accuracy when answering Maya.",skill:"vocabulary in context"},
+ {s:"Why is careful control especially important today?",o:["The gym has less space than the field.","The players are using a heavier ball.","The team is playing a championship game.","The players have no partners."],a:0,e:"The coach explains that indoor space is limited.",skill:"details"},
+ {s:"How does the coach respond to Noah's request?",o:["Noah must leave practice.","Noah must skip every station.","Noah must coach the other players.","Noah may watch once and then try."],a:3,e:"Watching a demonstration is allowed before joining in.",skill:"details"},
+ {s:"When should students take a water break?",o:["Before the first demonstration","After every pass they make","After completing all three stations","Whenever their partner changes stations"],a:2,e:"The break comes after the group completes all three stations.",skill:"sequence"},
+ {s:"What is the coach's main purpose?",o:["To explain the rules of a professional tournament","To explain how today's practice will work","To persuade students to buy new equipment","To announce the result of yesterday's game"],a:1,e:"The talk explains the location, stations, expectations, and wrap-up.",skill:"main idea"},
+ {s:"What should students write at the end of practice?",o:["The names of every player","The number of goals Lena scored","One skill they want to improve","A reason to cancel the next practice"],a:2,e:"The final instruction is to identify a skill for improvement.",skill:"details"}
+];
+const L="ABCD";
+let answers=Array(Q.length).fill(null), checked=false, plays=0, keyShown=false;
+
+// ---- transcript
+document.getElementById('transcript').innerHTML = SCRIPT.map(p=>`<p>${p}</p>`).join('');
+document.getElementById('togTranscript').onclick = e=>{
+  const t=document.getElementById('transcript'); t.classList.toggle('hidden');
+  e.target.textContent = t.classList.contains('hidden') ? 'Show transcript (teacher / support)' : 'Hide transcript';
+};
+
+// ---- audio
+const audio=document.getElementById('audio'), playBtn=document.getElementById('play'), stopBtn=document.getElementById('stop'), rateSel=document.getElementById('rate');
+const fmt=s=>{s=Math.round(s||0);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+function ui(){
+  const playing=!audio.paused && !audio.ended;
+  playBtn.textContent = playing ? '⏸ Pause' : (audio.currentTime>0 && !audio.ended ? '▶ Resume' : '▶ Play Coach Rivera');
+  playBtn.classList.toggle('playing',playing); stopBtn.disabled=!(playing||audio.currentTime>0);
+}
+playBtn.onclick=()=>{
+  audio.playbackRate=parseFloat(rateSel.value);
+  if(audio.paused){
+    if(audio.currentTime===0||audio.ended){ plays++; document.getElementById('plays').textContent='Plays: '+plays; }
+    audio.play().catch(()=>{ document.getElementById('ttsNote').textContent="Audio couldn't start on this device. Tap Play again, or ask your teacher to read the script aloud."; });
+  } else audio.pause();
+  ui();
+};
+stopBtn.onclick=()=>{ audio.pause(); audio.currentTime=0; ui(); };
+rateSel.onchange=()=>{ audio.playbackRate=parseFloat(rateSel.value); };
+audio.addEventListener('timeupdate',()=>{
+  document.getElementById('time').textContent=fmt(audio.currentTime)+' / '+fmt(audio.duration);
+  document.getElementById('audioBar').style.width=(audio.duration?audio.currentTime/audio.duration*100:0)+'%';
+});
+['play','pause','ended'].forEach(e=>audio.addEventListener(e,ui));
+audio.addEventListener('error',()=>{ playBtn.disabled=true; document.getElementById('ttsNote').textContent="The audio file couldn't load. Open the transcript or ask your teacher to read the script aloud."; });
+
+// ---- quiz
+const quiz=document.getElementById('quiz');
+function render(){
+  quiz.innerHTML = Q.map((q,i)=>`
+    <div class="q" id="q${i}">
+      <div class="stem"><span class="qnum">${i+1}</span>${q.s}</div>
+      ${q.o.map((o,j)=>`<label class="opt" id="o${i}_${j}"><input type="radio" name="q${i}" value="${j}"><span><b>${L[j]}.</b> ${o}</span></label>`).join('')}
+      <div class="fb" id="fb${i}"></div>
+    </div>`).join('');
+  quiz.querySelectorAll('input[type=radio]').forEach(r=>r.onchange=()=>{
+    const i=+r.name.slice(1), j=+r.value; answers[i]=j;
+    document.querySelectorAll(`#q${i} .opt`).forEach(o=>o.classList.remove('picked'));
+    document.getElementById(`o${i}_${j}`).classList.add('picked');
+    if(document.getElementById('instant').checked) grade(i,true);
+  });
+}
+function grade(i,single){
+  const q=Q[i], el=document.getElementById('q'+i), fb=document.getElementById('fb'+i);
+  el.classList.remove('correct','wrong');
+  if(answers[i]===null){ if(!single){fb.textContent='No answer chosen.'; el.classList.add('wrong');} return false; }
+  const ok=answers[i]===q.a; el.classList.add(ok?'correct':'wrong');
+  fb.innerHTML = ok ? `✔ Correct. ${q.e}` : `✘ Not quite. The answer is <b>${L[q.a]}</b>. ${q.e}`;
+  return ok;
+}
+document.getElementById('check').onclick=()=>{
+  const unanswered=answers.filter(a=>a===null).length;
+  if(unanswered && !checked){ ask(`You have ${unanswered} unanswered question${unanswered>1?'s':''}. Check anyway?`, finish); return; }
+  finish();
+};
+function finish(){
+  checked=true;
+  let score=0, miss={};
+  Q.forEach((q,i)=>{ if(grade(i,false)) score++; else miss[q.skill]=(miss[q.skill]||0)+1; });
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('scoreTxt').textContent=`Score: ${score} / ${Q.length}`;
+  document.getElementById('barFill').style.width=(score/Q.length*100)+'%';
+  const m=Object.entries(miss).map(([k,v])=>`${k} (${v})`).join(', ');
+  document.getElementById('skills').textContent = score===Q.length ? 'Perfect score — main idea, details, sequence, and vocabulary in context all strong.' : `Skills to practice: ${m}. Listen again and look for these.`;
+  document.getElementById('results').scrollIntoView({behavior:'smooth'});
+}
+document.getElementById('reset').onclick=()=>ask('Clear all answers and start over?',()=>{
+  answers=Array(Q.length).fill(null); checked=false; keyShown=false; render();
+  document.getElementById('results').classList.add('hidden'); document.getElementById('goal').value='';
+});
+document.getElementById('key').onclick=()=>{
+  if(keyShown){ document.querySelectorAll('.opt.key').forEach(o=>o.classList.remove('key')); keyShown=false; return; }
+  ask('Show the answer key? (Teacher use)',()=>{ Q.forEach((q,i)=>document.getElementById(`o${i}_${q.a}`).classList.add('key')); keyShown=true; });
+};
+document.getElementById('copy').onclick=()=>{
+  const name=document.getElementById('name').value||'(no name)', block=document.getElementById('block').value||'—';
+  const lines=Q.map((q,i)=>`${i+1}. ${answers[i]===null?'—':L[answers[i]]}${answers[i]===q.a?' ✔':' ✘'}`).join('\n');
+  const txt=`A Change of Plans — Listening\n${name} • Block ${block} • ${new Date().toLocaleDateString()}\n${document.getElementById('scoreTxt').textContent}\nPlays: ${plays}\n${lines}\nGoal: ${document.getElementById('goal').value||'—'}`;
+  navigator.clipboard.writeText(txt).then(()=>document.getElementById('copied').textContent='Copied!').catch(()=>document.getElementById('copied').textContent='Copy blocked — select and copy manually.');
+};
+
+// ---- dialog
+function ask(msg,yes){
+  const d=document.getElementById('dlg'); document.getElementById('dlgMsg').textContent=msg; d.style.display='flex';
+  document.getElementById('dlgYes').onclick=()=>{d.style.display='none';yes();};
+  document.getElementById('dlgNo').onclick=()=>{d.style.display='none';};
+}
+render();
+</script>
+</body>
+</html>
